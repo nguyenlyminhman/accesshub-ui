@@ -1,10 +1,12 @@
 import { Routes, Route } from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout'
-import LoginLayout from '../layouts/LoginLayout'
-import Login from '../pages/Login'
-import Dashboard from '../pages/Dashboard'
-import UserList from '../pages/UserList'
-import UserCreate from '../pages/UserCreate'
+import ProtectedRoute from './ProtectedRoute'
+import AuthLayout from '@/layouts/AuthLayout'
+import LoginPage from '@/features/auth/pages/LoginPage'
+import DashboardPage from '@/features/dashboard/pages/DashboardPage'
+import ForbiddenPage from '@/pages/ForbiddenPage'
+import NotFoundPage from '@/pages/NotFoundPage'
+import UserListPage from '@/features/users/pages/UserListPage'
 
 
 
@@ -13,20 +15,16 @@ const AppRouter = () => {
     <Routes>
       {/* Guest routes: chỉ cho phép khi chưa login */}
 
-      <Route element={<LoginLayout />}>
-        <Route path="/login" element={<Login />} />
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<LoginPage />} />
       </Route>
 
 
       {/* Protected routes: phải login mới vào được */}
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-
-          {/* User Management — check quyền theo path */}
-          <Route path="/users/list" element={<UserList />} />
-          <Route path="/users/create" element={<UserCreate />} />
-
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/users/list" element={<UserListPage />} />
         </Route>
       </Route>
 
