@@ -3,6 +3,7 @@ import { Layout, Menu } from 'antd'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useMenuStore } from '@/stores/menu.store'
 import { mapBackendMenuToAntdItems } from '@/utils/menu.mapper'
+import { icons } from 'antd/es/image/PreviewGroup'
 
 const { Sider } = Layout
 
@@ -19,8 +20,41 @@ const Sidebar = ({ collapsed }: Props) => {
   useEffect(() => {
     setSelectedKeys([location.pathname])
   }, [location.pathname])
+  
+  const menus = [
+  {
+    id: 1,
+    path: "/dashboard",
+    title: "Dashboard",
+    icon: null,
+    children: []
+  },
+  {
+    id: 2,
+    path: "/users",
+    title: "User Management",
+    icon: null,
+    children: [
+      {
+        id: 3,
+        path: "/users/list",
+        title: "User List",
+        icon: null,
+        children: []
+      },
+      {
+        id: 4,
+        path: "/users/create",
+        title: "Create User",
+        icon: null,
+        children: []
+      },
+    ],
+  },
+];
 
-  const menuItems = mapBackendMenuToAntdItems(backendMenus, navigate)
+
+  const menuItems = mapBackendMenuToAntdItems(menus, navigate)
 
   return (
     <Sider

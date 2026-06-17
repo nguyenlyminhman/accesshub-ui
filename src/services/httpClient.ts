@@ -1,5 +1,6 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useAuthStore } from '@/stores/auth.store'
+import type { BaseResponse } from '@/types/common.type'
 
 const httpClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
@@ -15,17 +16,32 @@ httpClient.interceptors.request.use((config) => {
   return config
 })
 
-// Xử lý token expired
+// Xử lý mọi Response
 httpClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  (error: AxiosError) => {
+
+    // Token hết hạn → clear store → redirect login
     if (error.response?.status === 401) {
-      // Token hết hạn → clear store → redirect login
       useAuthStore.getState().logout()
-      window.location.href = '/login'
+      window.location.href = '/'
     }
-    return Promise.reject(error)
+
+    let errorMessage = 'Có lỗi xảy ra, vui lòng thử lại sau';
+    // Kiểm tra nếu lỗi trả về từ phía Backend (có response và data)
+    if (error.response && error.response.data) {
+      const errorData = error.response.data as BaseResponse<null>;
+      
+      // Lấy trực tiếp trường "message" theo format chung mà BE trả về
+      errorMessage = errorData.message || errorMessage;
+    } else if (error.message) {
+      // Lỗi mạng hoặc server sập nguồn không trả về data
+      errorMessage = error.message;
+    }
+
+    // Ném lỗi đã được định dạng đẹp đẽ này ra ngoài
+    return Promise.reject(new Error(errorMessage));
   }
 )
 
-export default httpClient
+export default httpClient;

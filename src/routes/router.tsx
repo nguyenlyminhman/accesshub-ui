@@ -16,9 +16,8 @@ const AppRouter = () => {
       {/* Guest routes: chỉ cho phép khi chưa login */}
 
       <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LoginPage />} />
       </Route>
-
 
       {/* Protected routes: phải login mới vào được */}
       <Route element={<ProtectedRoute />}>
@@ -29,8 +28,9 @@ const AppRouter = () => {
       </Route>
 
       {/* Fallback routes */}
-      <Route path="/403" element={<ForbiddenPage />} />
+      
       <Route path="*" element={<NotFoundPage />} />
+      <Route path="/403" element={<ForbiddenPage />} />
     </Routes>
   )
 }

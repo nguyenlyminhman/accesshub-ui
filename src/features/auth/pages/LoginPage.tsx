@@ -18,13 +18,16 @@ const LoginPage = () => {
   const from = (location.state as { from?: Location })?.from?.pathname ?? '/dashboard'
 
   const handleSubmit = async (values: LoginPayload) => {
+    values.projectCode = 'ACH';
+
     try {
-      const { accessToken, user, menus } = await authService.login(values)
-      setAuth(accessToken, user)
-      setMenus(menus)
+      const { data } = await authService.login(values)
+      const { accessToken, menuList, userInfo } = data;
+      setAuth(accessToken, userInfo)
+      setMenus(menuList)
       navigate(from, { replace: true })
-    } catch {
-      message.error('Sai tên đăng nhập hoặc mật khẩu!')
+    } catch (error: any) {
+      message.error(error?.message)
     }
   }
 

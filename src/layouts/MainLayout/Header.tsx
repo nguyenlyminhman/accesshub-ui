@@ -23,7 +23,7 @@ const AppHeader = ({ collapsed, onToggle }: Props) => {
 
   const handleLogout = () => {
     logout()
-    navigate('/login')
+    navigate('/')
   }
 
   const dropdownItems: MenuProps['items'] = [

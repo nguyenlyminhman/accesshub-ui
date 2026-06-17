@@ -1,25 +1,27 @@
+import type { BaseResponse } from "@/types/common.type"
+
 export interface LoginPayload {
   username: string
   password: string
+  projectCode: string
 }
-
 export interface UserInfo {
-  id: number
-  fullName: string
+  username: string
   email: string
+  deptCode: string
+  deptName: string
+  details: string
   roles: string[]
 }
-
-export interface BackendMenu {
-  id: number
-  title: string
-  path: string
-  icon: string | null
-  children: BackendMenu[]
+export interface MenuList {
+  [key: string]: any 
 }
 
-export interface LoginResponse {
+export interface LoginData {
   accessToken: string
-  user: UserInfo
-  menus: BackendMenu[]
+  userInfo: UserInfo
+  menuList: MenuList[]
 }
+
+export type LoginResponse = BaseResponse<LoginData>;
+export type LoginErrorResponse = BaseResponse<null>;
