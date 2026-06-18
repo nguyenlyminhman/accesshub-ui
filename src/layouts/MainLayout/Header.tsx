@@ -59,7 +59,7 @@ const AppHeader = ({ collapsed, onToggle }: Props) => {
       <Dropdown menu={{ items: dropdownItems }} placement="bottomRight">
         <Space style={{ cursor: 'pointer' }}>
           <Avatar size="small" icon={<UserOutlined />} />
-          <Typography.Text>{user?.fullName ?? 'User'}</Typography.Text>
+          <Typography.Text>{user?.username ?? 'User'}</Typography.Text>
         </Space>
       </Dropdown>
     </Header>

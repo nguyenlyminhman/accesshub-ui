@@ -1,8 +1,8 @@
 import type { MenuProps } from 'antd'
 import * as AntdIcons from '@ant-design/icons'
-import type { BackendMenu } from '@/features/auth/types/auth.type'
+import type { MenuList } from '@/features/auth/types/auth.type'
 import type { NavigateFunction } from 'react-router-dom'
-import React from 'react'
+import React, { type ReactNode } from 'react'
 
 type AntdMenuItem = Required<MenuProps>['items'][number]
 
@@ -18,28 +18,65 @@ const getIconByName = (iconName: string | null): React.ReactNode | undefined => 
   return React.createElement(IconComponent)
 }
 
+type CustomMenuItem = {
+  key: string;
+  label: string;
+  icon?: ReactNode;
+  onClick?: () => void;
+  children?: CustomMenuItem[];
+  parentId: number | string | null;
+};
+
 export const mapBackendMenuToAntdItems = (
-  menus: BackendMenu[],
-  navigate: NavigateFunction
-): AntdMenuItem[] => {
-  return menus.map((menu) => {
-    const icon = getIconByName(menu.icon)
-    const hasChildren = menu.children && menu.children.length > 0
+  menus: MenuList[],
+  navigate: (url: string) => void
+): MenuProps['items'] => { // Sử dụng MenuProps['items'] làm kiểu trả về chuẩn cho Antd Menu
+  if (!menus || menus.length === 0) return [];
 
-    if (hasChildren) {
-      return {
-        key: menu.path,
-        icon,
-        label: menu.title,
-        children: mapBackendMenuToAntdItems(menu.children, navigate),
-      }
-    }
+  // Bước A: Sử dụng CustomMenuItem để định nghĩa Map, tránh lỗi từ Union Type của Antd
+  const menuMap: { [key: string]: CustomMenuItem } = {};
+  const rootItems: CustomMenuItem[] = [];
 
-    return {
-      key: menu.path,
-      icon,
+  const sortedMenus = [...menus].sort((a, b) => a.sortOrder - b.sortOrder);
+
+  // Bước B: Khởi tạo dữ liệu vào Map
+  sortedMenus.forEach((menu) => {
+    menuMap[menu.uiCode] = {
+      key: menu.uiCode, 
       label: menu.title,
-      onClick: () => navigate(menu.path),
+      icon: menu.icon || undefined, 
+      parentId: menu.parentId,
+      onClick: () => navigate(menu.url), 
+    };
+  });
+
+  // Bước C: Dựng cây (Lúc này parentItem đã được định danh rõ ràng thuộc tính children)
+  sortedMenus.forEach((menu) => {
+    const currentItem = menuMap[menu.uiCode];
+    
+    if (menu.parentId !== null && menuMap[String(menu.parentId)]) {
+      const parentItem = menuMap[String(menu.parentId)];
+      
+      if (!parentItem.children) {
+        parentItem.children = [];
+      }
+      
+      // Node cha thì xóa onClick đi để Antd tự xử lý đóng/mở SubMenu
+      delete parentItem.onClick; 
+      
+      parentItem.children.push(currentItem);
+    } else {
+      rootItems.push(currentItem);
     }
-  })
-}
+  });
+
+  // Bước D: Đảm bảo "ui_0" luôn nằm ở vị trí đầu tiên
+  const dashboardIndex = rootItems.findIndex(item => item.key === "ui_0");
+  if (dashboardIndex > 0) {
+    const [dashboardItem] = rootItems.splice(dashboardIndex, 1);
+    rootItems.unshift(dashboardItem);
+  }
+
+  // Trả về rootItems (TypeScript sẽ tự động ép kiểu từ CustomMenuItem[] sang MenuProps['items'] một cách an toàn)
+  return rootItems as MenuProps['items'];
+};

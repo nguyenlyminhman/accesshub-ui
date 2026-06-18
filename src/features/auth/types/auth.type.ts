@@ -1,4 +1,5 @@
 import type { BaseResponse } from "@/types/common.type"
+import type { ReactNode } from "react"
 
 export interface LoginPayload {
   username: string
@@ -14,7 +15,15 @@ export interface UserInfo {
   roles: string[]
 }
 export interface MenuList {
-  [key: string]: any 
+  id?: number;
+  title: string;
+  uiCode: string;
+  url: string;
+  parentId: number | string | null;
+  sortOrder: number;
+  permissions: string | null;
+  icon?: ReactNode | null;
+  children?: MenuList[];
 }
 
 export interface LoginData {

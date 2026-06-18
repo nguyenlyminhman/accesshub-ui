@@ -1,15 +1,31 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Layout, Menu } from 'antd'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useMenuStore } from '@/stores/menu.store'
 import { mapBackendMenuToAntdItems } from '@/utils/menu.mapper'
-import { icons } from 'antd/es/image/PreviewGroup'
+import {
+  LockOutlined,
+  DatabaseOutlined,
+  LaptopOutlined,
+  DashboardOutlined
+} from "@ant-design/icons";
 
 const { Sider } = Layout
 
 interface Props {
   collapsed: boolean
 }
+
+// --- TỐI ƯU 1: Đưa mảng định nghĩa cấu hình tĩnh ra NGOÀI Component ---
+// Việc này giúp tránh tạo lại mảng và Map ở mỗi lần component render.
+const CONFIG_MENUS = [
+  { title: "Dashboard", uiCode: "ui_0", url: "/dashboard", icon: <DashboardOutlined /> },
+  { title: "Organization", uiCode: "ui_1", url: "/organization", icon: <DatabaseOutlined /> },
+  { title: "Project", uiCode: "ui_2", url: "/project", icon: <LockOutlined /> },
+  { title: "Authentication", uiCode: "ui_4", url: "/authentication", icon: <LaptopOutlined /> }
+]
+
+const feMenuMap = new Map(CONFIG_MENUS.map(item => [item.uiCode, item.icon]));
 
 const Sidebar = ({ collapsed }: Props) => {
   const navigate = useNavigate()
@@ -19,42 +35,48 @@ const Sidebar = ({ collapsed }: Props) => {
 
   useEffect(() => {
     setSelectedKeys([location.pathname])
-  }, [location.pathname])
+  }, [location.pathname]);
   
-  const menus = [
-  {
-    id: 1,
-    path: "/dashboard",
-    title: "Dashboard",
-    icon: null,
-    children: []
-  },
-  {
-    id: 2,
-    path: "/users",
-    title: "User Management",
-    icon: null,
-    children: [
-      {
-        id: 3,
-        path: "/users/list",
-        title: "User List",
-        icon: null,
-        children: []
-      },
-      {
-        id: 4,
-        path: "/users/create",
-        title: "Create User",
-        icon: null,
-        children: []
-      },
-    ],
-  },
-];
+  useEffect(() => {
 
+    const currentMenu = backendMenus?.find(item => item.url === location.pathname);
 
-  const menuItems = mapBackendMenuToAntdItems(menus, navigate)
+    if (currentMenu) {
+      setSelectedKeys([currentMenu.uiCode]);
+    } else if (location.pathname === '/dashboard') {
+      setSelectedKeys(['ui_0']);
+    } else {
+      setSelectedKeys([location.pathname]);
+    }
+  }, [location.pathname, backendMenus]);
+
+  const menuItems = useMemo(() => {
+    if (!backendMenus) return [];
+
+    let finalMenu = backendMenus.map(beItem => ({
+      ...beItem,
+      icon: feMenuMap.get(beItem.uiCode) || null
+    }));
+
+    const dashboardInBe = finalMenu.find(item => item.uiCode === "ui_0");
+
+    if (dashboardInBe) {
+      finalMenu = [dashboardInBe, ...finalMenu.filter(item => item.uiCode !== "ui_0")];
+    } else {
+      const dashboardInFe = CONFIG_MENUS.find(item => item.uiCode === "ui_0");
+      if (dashboardInFe) {
+        finalMenu.unshift({
+          ...dashboardInFe,
+          parentId: null,
+          permissions: null,
+          sortOrder: -1
+        });
+      }
+    }
+
+    return mapBackendMenuToAntdItems(finalMenu, navigate);
+
+  }, [backendMenus, navigate]);
 
   return (
     <Sider
@@ -83,7 +105,7 @@ const Sidebar = ({ collapsed }: Props) => {
         theme="dark"
         mode="inline"
         selectedKeys={selectedKeys}
-        defaultOpenKeys={[]} // hoặc derive từ path hiện tại
+        defaultOpenKeys={[]}
         items={menuItems}
       />
     </Sider>

@@ -6,7 +6,9 @@ import LoginPage from '@/features/auth/pages/LoginPage'
 import DashboardPage from '@/features/dashboard/pages/DashboardPage'
 import ForbiddenPage from '@/pages/ForbiddenPage'
 import NotFoundPage from '@/pages/NotFoundPage'
-import UserListPage from '@/features/users/pages/UserListPage'
+import ProjectPage from '@/features/project/pages/ProjectPage'
+import AuthenticationPage from '@/features/authentication/pages/AuthenticationPage'
+import OrganizationPage from '@/features/organization/pages/OrganizationPage'
 
 
 
@@ -23,12 +25,13 @@ const AppRouter = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/users/list" element={<UserListPage />} />
+          <Route path="/project" element={<ProjectPage />} />
+          <Route path="/authentication" element={<AuthenticationPage />} />
+          <Route path="/organization" element={<OrganizationPage />} />
         </Route>
       </Route>
 
       {/* Fallback routes */}
-      
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/403" element={<ForbiddenPage />} />
     </Routes>

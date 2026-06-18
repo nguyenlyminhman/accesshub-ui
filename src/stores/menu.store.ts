@@ -1,10 +1,10 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { BackendMenu } from '@/features/auth/types/auth.type'
+import type { MenuList } from '@/features/auth/types/auth.type'
 
 interface MenuState {
-  menus: BackendMenu[]
-  setMenus: (menus: BackendMenu[]) => void
+  menus: MenuList[]
+  setMenus: (menus: MenuList[]) => void
   clearMenus: () => void
 }
 
