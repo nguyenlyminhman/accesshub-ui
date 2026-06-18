@@ -29,6 +29,7 @@ const AppRouter = () => {
           <Route path="/authentication" element={<AuthenticationPage />} />
           <Route path="/organization" element={<OrganizationPage />} />
           <Route path="/organization/department" element={<OrganizationPage />} />
+          <Route path="/organization/user" element={<OrganizationPage />} />
         </Route>
       </Route>
 

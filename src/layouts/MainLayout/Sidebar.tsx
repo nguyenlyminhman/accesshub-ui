@@ -22,6 +22,7 @@ const CONFIG_MENUS = [
   { title: "Project", uiCode: "ui_2", url: "/project", icon: <LockOutlined /> },
   { title: "Authentication", uiCode: "ui_4", url: "/authentication", icon: <LaptopOutlined /> },
   { title: "Department", uiCode: "ui_5", url: "/organization/department", icon: <DatabaseOutlined /> },
+  { title: "User", uiCode: "ui_6", url: "/organization/user", icon: <DatabaseOutlined /> },
 ]
 
 const feMenuMap = new Map(CONFIG_MENUS.map(item => [item.uiCode, item.icon]));
@@ -107,7 +108,7 @@ const Sidebar = ({ collapsed }: Props) => {
           transition: 'all 0.3s',
         }}
       >
-        {collapsed ? 'A' : 'MyApp'}
+        {collapsed ? 'ACH' : 'Access Hub'}
       </div>
 
       <Menu

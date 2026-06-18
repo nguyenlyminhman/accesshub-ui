@@ -1,4 +1,4 @@
-import { Form, Input, Button, Card, Typography, message } from 'antd'
+import { Form, Input, Button, Card, Typography, message, notification } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { authService } from '../services/auth.service'
@@ -27,7 +27,7 @@ const LoginPage = () => {
       setMenus(menuList)
       navigate(from, { replace: true })
     } catch (error: any) {
-      message.error(error?.message)
+      notification.error({ description: error.message });
     }
   }
 
