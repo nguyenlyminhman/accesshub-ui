@@ -16,56 +16,55 @@ interface Props {
   collapsed: boolean
 }
 
-// --- TỐI ƯU 1: Đưa mảng định nghĩa cấu hình tĩnh ra NGOÀI Component ---
-// Việc này giúp tránh tạo lại mảng và Map ở mỗi lần component render.
 const CONFIG_MENUS = [
   { title: "Dashboard", uiCode: "ui_0", url: "/dashboard", icon: <DashboardOutlined /> },
-  { title: "Organization", uiCode: "ui_1", url: "/organization", icon: <DatabaseOutlined /> },
+  { title: "Organization", uiCode: "ui_1", url: "/organization", icon: <DatabaseOutlined /> },  
   { title: "Project", uiCode: "ui_2", url: "/project", icon: <LockOutlined /> },
-  { title: "Authentication", uiCode: "ui_4", url: "/authentication", icon: <LaptopOutlined /> }
+  { title: "Authentication", uiCode: "ui_4", url: "/authentication", icon: <LaptopOutlined /> },
+  { title: "Department", uiCode: "ui_5", url: "/organization/department", icon: <DatabaseOutlined /> },
 ]
 
 const feMenuMap = new Map(CONFIG_MENUS.map(item => [item.uiCode, item.icon]));
+
+const getParentKeysByPath = (items: any[], currentPath: string): string[] => {
+  if (!items) return [];
+  for (const item of items) {
+    if (item.children) {
+      const hasChild = item.children.some((child: any) => child.key === currentPath);
+      if (hasChild) return [item.key];
+      
+      const subParentKeys = getParentKeysByPath(item.children, currentPath);
+      if (subParentKeys.length > 0) return [item.key, ...subParentKeys];
+    }
+  }
+  return [];
+};
 
 const Sidebar = ({ collapsed }: Props) => {
   const navigate = useNavigate()
   const location = useLocation()
   const backendMenus = useMenuStore((s) => s.menus)
-  const [selectedKeys, setSelectedKeys] = useState<string[]>([])
-
-  useEffect(() => {
-    setSelectedKeys([location.pathname])
-  }, [location.pathname]);
   
-  useEffect(() => {
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([location.pathname])
 
-    const currentMenu = backendMenus?.find(item => item.url === location.pathname);
-
-    if (currentMenu) {
-      setSelectedKeys([currentMenu.uiCode]);
-    } else if (location.pathname === '/dashboard') {
-      setSelectedKeys(['ui_0']);
-    } else {
-      setSelectedKeys([location.pathname]);
-    }
-  }, [location.pathname, backendMenus]);
+  const [openKeys, setOpenKeys] = useState<string[]>([])
 
   const menuItems = useMemo(() => {
-    if (!backendMenus) return [];
+    if (!backendMenus || backendMenus.length === 0) return [];
 
-    let finalMenu = backendMenus.map(beItem => ({
-      ...beItem,
-      icon: feMenuMap.get(beItem.uiCode) || null
+    let finalMenu = backendMenus.map(beItem => ({ 
+      ...beItem, 
+      icon: feMenuMap.get(beItem.uiCode) || null 
     }));
 
     const dashboardInBe = finalMenu.find(item => item.uiCode === "ui_0");
-
     if (dashboardInBe) {
       finalMenu = [dashboardInBe, ...finalMenu.filter(item => item.uiCode !== "ui_0")];
     } else {
       const dashboardInFe = CONFIG_MENUS.find(item => item.uiCode === "ui_0");
       if (dashboardInFe) {
         finalMenu.unshift({
+          id: 0,
           ...dashboardInFe,
           parentId: null,
           permissions: null,
@@ -75,8 +74,18 @@ const Sidebar = ({ collapsed }: Props) => {
     }
 
     return mapBackendMenuToAntdItems(finalMenu, navigate);
-
   }, [backendMenus, navigate]);
+
+  useEffect(() => {
+    setSelectedKeys([location.pathname])
+    const parentKeys = getParentKeysByPath(menuItems || [], location.pathname);
+    if (!collapsed && parentKeys.length > 0) {
+      setOpenKeys((prev) => {
+        const uniqueKeys = new Set([...prev, ...parentKeys]);
+        return Array.from(uniqueKeys);
+      });
+    }
+  }, [location.pathname, menuItems, collapsed]);
 
   return (
     <Sider
@@ -105,7 +114,8 @@ const Sidebar = ({ collapsed }: Props) => {
         theme="dark"
         mode="inline"
         selectedKeys={selectedKeys}
-        defaultOpenKeys={[]}
+        openKeys={collapsed ? [] : openKeys}
+        onOpenChange={(keys) => setOpenKeys(keys)}
         items={menuItems}
       />
     </Sider>

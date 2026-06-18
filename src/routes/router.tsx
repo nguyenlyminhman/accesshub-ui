@@ -28,6 +28,7 @@ const AppRouter = () => {
           <Route path="/project" element={<ProjectPage />} />
           <Route path="/authentication" element={<AuthenticationPage />} />
           <Route path="/organization" element={<OrganizationPage />} />
+          <Route path="/organization/department" element={<OrganizationPage />} />
         </Route>
       </Route>
 
