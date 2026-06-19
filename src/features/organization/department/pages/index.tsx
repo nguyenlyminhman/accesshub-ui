@@ -20,6 +20,7 @@ import {
     UserOutlined,
     TeamOutlined
 } from '@ant-design/icons';
+import { useDepartments } from '../hooks/useDepartments';
 
 // Mock data ban đầu cho AccessHub
 const initialData = [
@@ -54,8 +55,12 @@ const DepartmentPage = () => {
     const [data, setData] = useState(initialData);
     const [searchText, setSearchText] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingRecord, setEditingRecord] = useState(null);
+    const [editingRecord, setEditingRecord] = useState<any>(null);
     const [form] = Form.useForm();
+    const { data : departments, isLoading, isError, error } = useDepartments();
+
+    console.log(departments);
+    
 
     // Xử lý Xóa phòng ban
     const handleDelete = (record: any) => {
@@ -108,44 +113,72 @@ const DepartmentPage = () => {
     };
 
     // Định nghĩa các cột cho AntD Table
-    const columns = [
+    const columns: any = [
         {
-            title: 'Mã & Tên phòng ban',
-            dataIndex: 'name',
-            key: 'name',
+            title: 'Mã phòng ban',
+            dataIndex: 'deptCode',
+            key: 'deptCode',
             filteredValue: [searchText],
-            onFilter: (value, record) =>
-                record.name.toLowerCase().includes(value.toLowerCase()) ||
-                record.code.toLowerCase().includes(value.toLowerCase()) ||
-                record.manager.toLowerCase().includes(value.toLowerCase()),
-            render: (text, record) => (
+            onFilter: (value: any, record: any) =>
+                record.deptName.toLowerCase().includes(value.toLowerCase()) ||
+                record.deptCode.toLowerCase().includes(value.toLowerCase()),
+            render: (text: any, record: any) => (
                 <div>
                     <div className="font-semibold text-gray-900">{text}</div>
-                    <div className="text-xs text-gray-400 font-mono mt-0.5">
-                        {record.id} | Mã: <span className="font-semibold">{record.code}</span>
-                    </div>
                 </div>
             ),
         },
         {
-            title: 'Trưởng phòng',
-            dataIndex: 'manager',
-            key: 'manager',
-            render: (text) => (
-                <span className="inline-flex items-center gap-1.5 font-medium text-gray-700">
-                    <UserOutlined className="text-gray-400 text-xs" /> {text}
-                </span>
+            title: 'Tên phòng ban',
+            dataIndex: 'deptName',
+            key: 'deptName',
+            filteredValue: [searchText],
+            onFilter: (value: any, record: any) =>
+                record.deptName.toLowerCase().includes(value.toLowerCase()) ||
+                record.deptCode.toLowerCase().includes(value.toLowerCase()),
+            render: (text: any, record: any) => (
+                <div>
+                    <div className="font-semibold text-gray-900">{text}</div>
+                </div>
+            ),
+        },
+        // {
+        //     title: 'Trạng thái',
+        //     dataIndex: 'status',
+        //     key: 'status',
+        //     filters: [
+        //         { text: 'Hoạt động', value: 'ACTIVE' },
+        //         { text: 'Tạm dừng', value: 'INACTIVE' },
+        //     ],
+        //     onFilter: (value: any, record: any) => record.status === value,
+        //     render: (status: any) => (
+        //         <Tag color={status === 'ACTIVE' ? 'emerald' : 'amber'} className="m-0 font-medium px-2.5 py-0.5">
+        //             {status === 'ACTIVE' ? 'Hoạt động' : 'Tạm dừng'}
+        //         </Tag>
+        //     ),
+        // },
+        {
+            title: 'Miêu tả',
+            dataIndex: 'details',
+            key: 'details',
+            filteredValue: [searchText],
+            onFilter: (value: any, record: any) =>
+                record.deptName.toLowerCase().includes(value.toLowerCase()) ||
+                record.deptCode.toLowerCase().includes(value.toLowerCase()),
+            render: (text: string, record: any) => (
+                <div>
+                    <div className="font-semibold text-gray-900">{text}</div>
+                </div>
             ),
         },
         {
-            title: 'Nhân sự',
-            dataIndex: 'members',
-            key: 'members',
-            sorter: (a, b) => a.members - b.members,
-            render: (members) => (
-                <span className="inline-flex items-center gap-1.5 text-gray-600">
-                    <TeamOutlined className="text-gray-400" /> {members} thành viên
-                </span>
+            title: 'Ngày tạo',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            render: (text: string, record: any) => (
+                <div>
+                    <div className="font-semibold text-gray-900">{text}</div>
+                </div>
             ),
         },
         {
@@ -153,13 +186,13 @@ const DepartmentPage = () => {
             dataIndex: 'status',
             key: 'status',
             filters: [
-                { text: 'Hoạt động', value: 'Active' },
-                { text: 'Tạm dừng', value: 'Inactive' },
+                { text: 'Hoạt động', value: 'ACTIVE' },
+                { text: 'Tạm dừng', value: 'INACTIVE' },
             ],
             onFilter: (value: any, record: any) => record.status === value,
             render: (status: any) => (
-                <Tag color={status === 'Active' ? 'emerald' : 'amber'} className="m-0 font-medium px-2.5 py-0.5">
-                    {status === 'Active' ? 'Hoạt động' : 'Tạm dừng'}
+                <Tag color={status === 'ACTIVE' ? 'emerald' : 'amber'} className="m-0 font-medium px-2.5 py-0.5">
+                    {status === 'ACTIVE' ? 'Hoạt động' : 'Tạm dừng'}
                 </Tag>
             ),
         },
@@ -240,7 +273,7 @@ const DepartmentPage = () => {
       >
         <Table 
           columns={columns} 
-          dataSource={data} 
+          dataSource={departments} 
           rowClassName="hover:bg-slate-50/80 transition-all cursor-pointer"
           pagination={{
             pageSize: 5,

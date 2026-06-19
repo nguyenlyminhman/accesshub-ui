@@ -8,7 +8,7 @@ import ForbiddenPage from '@/pages/ForbiddenPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import ProjectPage from '@/features/project/pages/ProjectPage'
 import AuthenticationPage from '@/features/authentication/pages/AuthenticationPage'
-import OrganizationPage from '@/features/organization/pages/OrganizationPage'
+import OrganizationPage from '@/features/organization/users/pages/OrganizationPage'
 import Department from '@/features/organization/department/pages'
 
 

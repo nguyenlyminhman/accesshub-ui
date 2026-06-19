@@ -21,7 +21,8 @@ const LoginPage = () => {
     values.projectCode = 'ACH';
 
     try {
-      const { data } = await authService.login(values)
+      const data = await authService.login(values);
+        
       const { accessToken, menuList, userInfo } = data;
       setAuth(accessToken, userInfo)
       setMenus(menuList)

@@ -16,9 +16,21 @@ httpClient.interceptors.request.use((config) => {
   return config
 })
 
-// Xử lý mọi Response
+// Xử lý mọi Response từ BE
 httpClient.interceptors.response.use(
-  (response) => response,
+  // Xử lý data
+  (response) => {
+    const body = response.data as BaseResponse<unknown>;
+    // BE trả code 200 nhưng success lại false
+    if (!body.success) {
+      return Promise.reject(new Error(body.message || 'Có lỗi xảy ra, vui lòng thử lại sau'));
+    }
+
+    response.data = body.data;
+    return response;
+  },
+
+  // Xử lý lỗi
   (error: AxiosError) => {
 
     // Token hết hạn → clear store → redirect login

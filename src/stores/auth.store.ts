@@ -24,8 +24,7 @@ export const useAuthStore = create<AuthState>()(
         set({ accessToken: null, user: null, isAuthenticated: false }),
     }),
     {
-      name: 'auth-storage', // key trong localStorage
-      // Chỉ persist những gì cần
+      name: 'auth-storage',
       partialize: (state) => ({
         accessToken: state.accessToken,
         user: state.user,
