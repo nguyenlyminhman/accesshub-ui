@@ -9,7 +9,7 @@ import NotFoundPage from '@/pages/NotFoundPage'
 import ProjectPage from '@/features/project/pages/ProjectPage'
 import AuthenticationPage from '@/features/authentication/pages/AuthenticationPage'
 import OrganizationPage from '@/features/organization/pages/OrganizationPage'
-
+import Department from '@/features/organization/department/pages'
 
 
 const AppRouter = () => {
@@ -28,7 +28,7 @@ const AppRouter = () => {
           <Route path="/project" element={<ProjectPage />} />
           <Route path="/authentication" element={<AuthenticationPage />} />
           <Route path="/organization" element={<OrganizationPage />} />
-          <Route path="/organization/department" element={<OrganizationPage />} />
+          <Route path="/organization/department" element={<Department />} />
           <Route path="/organization/user" element={<OrganizationPage />} />
         </Route>
       </Route>

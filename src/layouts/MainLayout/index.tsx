@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Layout } from 'antd'
+import { Card, Layout } from 'antd'
 import Sidebar from './Sidebar'
 import AppHeader from './Header'
 
@@ -19,14 +19,16 @@ const MainLayout = () => {
         />
         <Content
           style={{
-            margin: '16px',
+            margin: '0px',
             padding: '24px',
-            background: '#fff',
+            background: '#e7e7e7',
             borderRadius: 8,
             minHeight: 280,
           }}
         >
-          <Outlet />
+          <Card variant="borderless">
+            <Outlet />
+          </Card>
         </Content>
       </Layout>
     </Layout>
