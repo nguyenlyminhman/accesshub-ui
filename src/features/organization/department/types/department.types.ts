@@ -14,8 +14,9 @@ export interface Department {
 }
 
 export interface CreateDepartmentPayload {
-  name: string;
-  code: string;
+  deptCode: string;
+  deptName: string;
+  details: string;
 }
 
 export type DepartmentResponse = BaseResponse<Department>;

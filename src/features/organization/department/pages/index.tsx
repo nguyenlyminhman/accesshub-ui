@@ -1,226 +1,231 @@
 import React, { useState } from 'react';
 import {
-    Table,
-    Button,
-    Input,
-    Tag,
-    Space,
-    Card,
-    Modal,
-    Form,
-    Select,
-    App
+  Table,
+  Button,
+  Input,
+  Tag,
+  Space,
+  Card,
+  Modal,
+  Form,
+  Select,
+  App,
+  notification
 } from 'antd';
 import {
-    PlusOutlined,
-    SearchOutlined,
-    EditOutlined,
-    DeleteOutlined,
-    ClusterOutlined,
-    UserOutlined,
-    TeamOutlined
+  PlusOutlined,
+  SearchOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  ClusterOutlined,
+  UserOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import { useDepartments } from '../hooks/useDepartments';
+import { useCreateDepartment } from '../hooks/useCreateDepartment';
 
 // Mock data ban đầu cho AccessHub
 const initialData = [
-    { key: '1', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
-    { key: '2', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
-    { key: '3', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
-    { key: '4', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
-    { key: '5', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
-    { key: '6', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
-    { key: '7', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
-    { key: '8', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
-    { key: '9', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
-    { key: '10', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
-    { key: '11', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
-    { key: '12', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
-    { key: '13', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
-    { key: '14', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
-    { key: '15', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
-    { key: '16', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
-    { key: '17', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
-    { key: '18', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
-    { key: '19', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
-    { key: '20', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
-    { key: '21', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
-    { key: '22', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
-    { key: '23', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
-    { key: '24', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
+  { key: '1', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
+  { key: '2', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
+  { key: '3', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
+  { key: '4', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
+  { key: '5', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
+  { key: '6', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
+  { key: '7', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
+  { key: '8', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
+  { key: '9', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
+  { key: '10', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
+  { key: '11', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
+  { key: '12', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
+  { key: '13', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
+  { key: '14', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
+  { key: '15', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
+  { key: '16', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
+  { key: '17', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
+  { key: '18', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
+  { key: '19', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
+  { key: '20', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
+  { key: '21', id: 'DEP001', name: 'Phòng Kỹ thuật (Engineering)', code: 'ENG', manager: 'Nguyễn Văn A', members: 24, status: 'Active' },
+  { key: '22', id: 'DEP002', name: 'Phòng Nhân sự (HR)', code: 'HR', manager: 'Trần Thị B', members: 8, status: 'Active' },
+  { key: '23', id: 'DEP003', name: 'Phòng Kinh doanh (Sales)', code: 'SAL', manager: 'Lê Hoàng C', members: 15, status: 'Active' },
+  { key: '24', id: 'DEP004', name: 'Phòng Marketing', code: 'MKT', manager: 'Phạm Minh D', members: 12, status: 'Inactive' },
 ];
 
 const DepartmentPage = () => {
-    const { message, modal } = App.useApp(); // Khởi tạo hook thông báo của AntD v6
-    const [data, setData] = useState(initialData);
-    const [searchText, setSearchText] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingRecord, setEditingRecord] = useState<any>(null);
-    const [form] = Form.useForm();
-    const { data : departments, isLoading, isError, error } = useDepartments();
+  const { message, modal } = App.useApp(); // Khởi tạo hook thông báo của AntD v6
+  const [data, setData] = useState(initialData);
+  const [searchText, setSearchText] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<any>(null);
+  const [form] = Form.useForm();
+  const { data: departments, isLoading, isError, error } = useDepartments();
+  const { mutate: createDepartment, isPending } = useCreateDepartment();
 
-    console.log(departments);
-    
 
-    // Xử lý Xóa phòng ban
-    const handleDelete = (record: any) => {
-        modal.confirm({
-            title: 'Xác nhận xóa',
-            content: `Bạn có chắc chắn muốn xóa phòng ban "${record.name}" không?`,
-            okText: 'Xóa',
-            okType: 'danger',
-            cancelText: 'Hủy',
-            onOk() {
-                setData(data.filter((item) => item.key !== record.key));
-                message.success('Xóa phòng ban thành công!');
-            },
-        });
-    };
+  console.count();
+  console.log(departments);
 
-    // Mở Modal (Thêm mới hoặc Sửa)
-    const openModal = (record = null) => {
-        setEditingRecord(record);
-        if (record) {
-            form.setFieldsValue(record);
-        } else {
-            form.resetFields();
+
+
+  // Xử lý Xóa phòng ban
+  const handleDelete = (record: any) => {
+    modal.confirm({
+      title: 'Xác nhận xóa',
+      content: `Bạn có chắc chắn muốn xóa phòng ban "${record.name}" không?`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk() {
+        setData(data.filter((item) => item.key !== record.key));
+        message.success('Xóa phòng ban thành công!');
+      },
+    });
+  };
+
+  // Mở Modal (Thêm mới hoặc Sửa)
+  const openModal = (record = null) => {
+    setEditingRecord(record);
+    if (record) {
+      form.setFieldsValue(record);
+    } else {
+      form.resetFields();
+    }
+    setIsModalOpen(true);
+  };
+
+  // Lưu Form (Submit)
+  const handleFormSubmit = () => {
+    form.validateFields().then((values) => {
+      if (editingRecord) {
+        // Cập nhật
+        setData(data.map((item) => (item.key === editingRecord.key ? { ...item, ...values } : item)));
+        message.success('Cập nhật phòng ban thành công!');
+      } else {
+        // Thêm mới
+        const deptNew = {
+          deptCode: Math.random().toString(36).substring(2, 7),
+          deptName: "string",
+          details: "string"
         }
-        setIsModalOpen(true);
-    };
 
-    // Lưu Form (Submit)
-    const handleFormSubmit = () => {
-        form.validateFields().then((values) => {
-            if (editingRecord) {
-                // Cập nhật
-                setData(data.map((item) => (item.key === editingRecord.key ? { ...item, ...values } : item)));
-                message.success('Cập nhật phòng ban thành công!');
-            } else {
-                // Thêm mới
-                const newDept = {
-                    key: Date.now().toString(),
-                    id: `DEP00${data.length + 1}`,
-                    members: 0,
-                    ...values,
-                };
-                setData([...data, newDept]);
-                message.success('Thêm phòng ban mới thành công!');
-            }
-            setIsModalOpen(false);
-        }).catch(info => {
-            console.log('Validate Failed:', info);
-        });
-    };
+         createDepartment(deptNew);
+      }
+      setIsModalOpen(false);
+    }).catch(info => {
+      console.log('Validate Failed:', info);
+    });
+  };
 
-    // Định nghĩa các cột cho AntD Table
-    const columns: any = [
-        {
-            title: 'Mã phòng ban',
-            dataIndex: 'deptCode',
-            key: 'deptCode',
-            filteredValue: [searchText],
-            onFilter: (value: any, record: any) =>
-                record.deptName.toLowerCase().includes(value.toLowerCase()) ||
-                record.deptCode.toLowerCase().includes(value.toLowerCase()),
-            render: (text: any, record: any) => (
-                <div>
-                    <div className="font-semibold text-gray-900">{text}</div>
-                </div>
-            ),
-        },
-        {
-            title: 'Tên phòng ban',
-            dataIndex: 'deptName',
-            key: 'deptName',
-            filteredValue: [searchText],
-            onFilter: (value: any, record: any) =>
-                record.deptName.toLowerCase().includes(value.toLowerCase()) ||
-                record.deptCode.toLowerCase().includes(value.toLowerCase()),
-            render: (text: any, record: any) => (
-                <div>
-                    <div className="font-semibold text-gray-900">{text}</div>
-                </div>
-            ),
-        },
-        // {
-        //     title: 'Trạng thái',
-        //     dataIndex: 'status',
-        //     key: 'status',
-        //     filters: [
-        //         { text: 'Hoạt động', value: 'ACTIVE' },
-        //         { text: 'Tạm dừng', value: 'INACTIVE' },
-        //     ],
-        //     onFilter: (value: any, record: any) => record.status === value,
-        //     render: (status: any) => (
-        //         <Tag color={status === 'ACTIVE' ? 'emerald' : 'amber'} className="m-0 font-medium px-2.5 py-0.5">
-        //             {status === 'ACTIVE' ? 'Hoạt động' : 'Tạm dừng'}
-        //         </Tag>
-        //     ),
-        // },
-        {
-            title: 'Miêu tả',
-            dataIndex: 'details',
-            key: 'details',
-            filteredValue: [searchText],
-            onFilter: (value: any, record: any) =>
-                record.deptName.toLowerCase().includes(value.toLowerCase()) ||
-                record.deptCode.toLowerCase().includes(value.toLowerCase()),
-            render: (text: string, record: any) => (
-                <div>
-                    <div className="font-semibold text-gray-900">{text}</div>
-                </div>
-            ),
-        },
-        {
-            title: 'Ngày tạo',
-            dataIndex: 'createdAt',
-            key: 'createdAt',
-            render: (text: string, record: any) => (
-                <div>
-                    <div className="font-semibold text-gray-900">{text}</div>
-                </div>
-            ),
-        },
-        {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            key: 'status',
-            filters: [
-                { text: 'Hoạt động', value: 'ACTIVE' },
-                { text: 'Tạm dừng', value: 'INACTIVE' },
-            ],
-            onFilter: (value: any, record: any) => record.status === value,
-            render: (status: any) => (
-                <Tag color={status === 'ACTIVE' ? 'emerald' : 'amber'} className="m-0 font-medium px-2.5 py-0.5">
-                    {status === 'ACTIVE' ? 'Hoạt động' : 'Tạm dừng'}
-                </Tag>
-            ),
-        },
-        {
-            title: 'Hành động',
-            key: 'action',
-            align: 'right',
-            render: (_: any, record: any) => (
-                <Space size="small">
-                    <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={() => openModal(record)}
-                        className="text-gray-500 hover:!text-indigo-600 hover:!bg-indigo-50"
-                    />
-                    <Button
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => handleDelete(record)}
-                        className="hover:!bg-rose-50"
-                    />
-                </Space>
-            ),
-        },
-    ];
+  // Định nghĩa các cột cho AntD Table
+  const columns: any = [
+    {
+      title: 'Mã phòng ban',
+      dataIndex: 'deptCode',
+      key: 'deptCode',
+      filteredValue: [searchText],
+      onFilter: (value: any, record: any) =>
+        record.deptName.toLowerCase().includes(value.toLowerCase()) ||
+        record.deptCode.toLowerCase().includes(value.toLowerCase()),
+      render: (text: any, record: any) => (
+        <div>
+          <div className="font-semibold text-gray-900">{text}</div>
+        </div>
+      ),
+    },
+    {
+      title: 'Tên phòng ban',
+      dataIndex: 'deptName',
+      key: 'deptName',
+      filteredValue: [searchText],
+      onFilter: (value: any, record: any) =>
+        record.deptName.toLowerCase().includes(value.toLowerCase()) ||
+        record.deptCode.toLowerCase().includes(value.toLowerCase()),
+      render: (text: any, record: any) => (
+        <div>
+          <div className="font-semibold text-gray-900">{text}</div>
+        </div>
+      ),
+    },
+    // {
+    //     title: 'Trạng thái',
+    //     dataIndex: 'status',
+    //     key: 'status',
+    //     filters: [
+    //         { text: 'Hoạt động', value: 'ACTIVE' },
+    //         { text: 'Tạm dừng', value: 'INACTIVE' },
+    //     ],
+    //     onFilter: (value: any, record: any) => record.status === value,
+    //     render: (status: any) => (
+    //         <Tag color={status === 'ACTIVE' ? 'emerald' : 'amber'} className="m-0 font-medium px-2.5 py-0.5">
+    //             {status === 'ACTIVE' ? 'Hoạt động' : 'Tạm dừng'}
+    //         </Tag>
+    //     ),
+    // },
+    {
+      title: 'Miêu tả',
+      dataIndex: 'details',
+      key: 'details',
+      filteredValue: [searchText],
+      onFilter: (value: any, record: any) =>
+        record.deptName.toLowerCase().includes(value.toLowerCase()) ||
+        record.deptCode.toLowerCase().includes(value.toLowerCase()),
+      render: (text: string, record: any) => (
+        <div>
+          <div className="font-semibold text-gray-900">{text}</div>
+        </div>
+      ),
+    },
+    {
+      title: 'Ngày tạo',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (text: string, record: any) => (
+        <div>
+          <div className="font-semibold text-gray-900">{text}</div>
+        </div>
+      ),
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      filters: [
+        { text: 'Hoạt động', value: 'ACTIVE' },
+        { text: 'Tạm dừng', value: 'INACTIVE' },
+      ],
+      onFilter: (value: any, record: any) => record.status === value,
+      render: (status: any) => (
+        <Tag color={status === 'ACTIVE' ? 'emerald' : 'amber'} className="m-0 font-medium px-2.5 py-0.5">
+          {status === 'ACTIVE' ? 'Hoạt động' : 'Tạm dừng'}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Hành động',
+      key: 'action',
+      align: 'right',
+      render: (_: any, record: any) => (
+        <Space size="small">
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={() => openModal(record)}
+            className="text-gray-500 hover:!text-indigo-600 hover:!bg-indigo-50"
+          />
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
+            className="hover:!bg-rose-50"
+          />
+        </Space>
+      ),
+    },
+  ];
 
-    return (
+  return (
     <div className="p-8 bg-[#f8fafc] min-h-screen font-sans antialiased">
       {/* Khối Header nổi bật hẳn lên */}
       <div className="bg-white rounded-2xl p-6 mb-6 shadow-md border border-slate-200/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition-all duration-300 hover:shadow-lg">
@@ -235,10 +240,10 @@ const DepartmentPage = () => {
             <p className="text-sm font-medium text-slate-400 mt-1">Hệ thống phân cấp tổ chức & cấu trúc nhân sự AccessHub</p>
           </div>
         </div>
-        
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
+
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
           size="large"
           onClick={() => openModal()}
           className="bg-indigo-600 hover:bg-indigo-700 font-bold shadow-md shadow-indigo-100 hover:shadow-lg hover:-translate-y-0.5 border-none h-12 px-6 rounded-xl transition-all duration-200"
@@ -248,8 +253,8 @@ const DepartmentPage = () => {
       </div>
 
       {/* Khối Bộ lọc Tìm kiếm độc lập */}
-      <Card 
-        className="mb-6 shadow-md border-slate-200/50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300" 
+      <Card
+        className="mb-6 shadow-md border-slate-200/50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
         bodyStyle={{ padding: '20px' }}
       >
         <div className="max-w-xl">
@@ -267,13 +272,13 @@ const DepartmentPage = () => {
       </Card>
 
       {/* Khối Bảng Danh Sách sang trọng */}
-      <Card 
-        className="shadow-xl border-slate-200/60 rounded-2xl overflow-hidden" 
+      <Card
+        className="shadow-xl border-slate-200/60 rounded-2xl overflow-hidden"
         bodyStyle={{ padding: 0 }}
       >
-        <Table 
-          columns={columns} 
-          dataSource={departments} 
+        <Table
+          columns={columns}
+          dataSource={departments}
           rowClassName="hover:bg-slate-50/80 transition-all cursor-pointer"
           pagination={{
             pageSize: 5,
